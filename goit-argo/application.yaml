@@ -18,23 +18,14 @@ spec:
           repository: burakince/mlflow
           tag: "3.4.0"
         
-        # Приклад: збільшуємо ресурси
-        # resources:
-        #   requests:
-        #     cpu: 300m
-        #     memory: 1Gi
-        #   limits:
-        #     cpu: 1500m
-        #     memory: 2Gi
-        
-        # Ресурси
+        # Ресурси (оновлено)
         resources:
           requests:
-            cpu: 200m
-            memory: 512Mi
-          limits:
-            cpu: 1000m
+            cpu: 300m
             memory: 1Gi
+          limits:
+            cpu: 1500m
+            memory: 2Gi
   destination:
     server: https://kubernetes.default.svc
     namespace: application
