@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mlflow.fullname" . }}
+  labels:
+    {{- include "mlflow.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "mlflow.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mlflow.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mlflow.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: MLFLOW_BACKEND_STORE_URI
+              value: "{{ .Values.mlflow.backendStore }}"
+            - name: MLFLOW_DEFAULT_ARTIFACT_ROOT
+              value: "{{ .Values.mlflow.defaultArtifactRoot }}"
+            - name: MLFLOW_HOST
+              value: "{{ .Values.mlflow.server.host }}"
+            - name: MLFLOW_PORT
+              value: "{{ .Values.mlflow.server.port }}"
+            - name: MLFLOW_WORKERS
+              value: "{{ .Values.mlflow.server.workers }}"
+            - name: MLFLOW_MAX_CONTENT_LENGTH
+              value: "{{ .Values.mlflow.server.maxContentLength }}"
+            - name: MLFLOW_STATIC_PREFIX
+              value: "{{ .Values.mlflow.server.staticPrefix }}"
+            - name: GUNICORN_CMD_ARGS
+              value: "{{ .Values.mlflow.server.gunicornOptions }}"
+          command:
+            - mlflow
+          args:
+            - server
+            - --host
+            - "0.0.0.0"
+            - --port
+            - "5000"
+            - --backend-store-uri
+            - "{{ .Values.mlflow.backendStore }}"
+            - --default-artifact-root
+            - "{{ .Values.mlflow.defaultArtifactRoot }}"
+          volumeMounts:
+            - name: mlflow-artifacts
+              mountPath: /mlflow/artifacts
+      volumes:
+        - name: mlflow-artifacts
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "mlflow.fullname" . }}-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
