@@ -20,9 +20,10 @@ goit-argo/
 
 - ✅ Використовує готовий Helm-чарт `mlflow` з `community-charts`
 - ✅ Образ: `burakince/mlflow:3.4.0`
-- ✅ Ресурси: CPU 700m/3000m, Memory 2.5Gi/5Gi
+- ✅ Ресурси: CPU 400m/2000m, Memory 1Gi/2Gi (GitOps v5.0)
 - ✅ Автоматична синхронізація через GitOps
-- ✅ Inline values в ArgoCD Application
+- ✅ Inline values в ArgoCD Application (Варіант A)
+- ✅ Доступ через kubectl port-forward
 
 ## Передумови
 
@@ -117,11 +118,71 @@ kubectl get pods -n application
 
 ### 3. Доступ до MLflow
 
+#### Варіант A: kubectl port-forward (рекомендовано)
+
 ```bash
-kubectl port-forward svc/mlflow -n application 5000:80
+# Запустити port-forward в фоновому режимі
+kubectl port-forward svc/mlflow -n application 5000:80 > /dev/null 2>&1 &
+
+# Перевірити доступ
+curl http://localhost:5000/health
+# Має повернути: OK
 ```
 
-Відкрийте браузер і перейдіть на: http://localhost:5000
+**Відкрийте браузер і перейдіть на:** http://localhost:5000
+
+#### Варіант B: LoadBalancer (для продакшену)
+
+```bash
+# Оновити сервіс на LoadBalancer
+kubectl patch svc mlflow -n application -p '{"spec":{"type":"LoadBalancer"}}'
+
+# Отримати зовнішній IP
+kubectl get svc mlflow -n application
+```
+
+**Примітка:** LoadBalancer створює зовнішній IP, але може коштувати додатково в AWS.
+
+## GitOps процес
+
+### Як оновити MLflow через Git
+
+1. **Відредагуйте `application.yaml`:**
+   ```yaml
+   helm:
+     values: |
+       # Змініть ресурси або інші параметри
+       resources:
+         requests:
+           cpu: 500m
+           memory: 1.5Gi
+   ```
+
+2. **Закомітьте зміни:**
+   ```bash
+   git add application.yaml
+   git commit -m "Update MLflow resources"
+   git push origin main
+   ```
+
+3. **ArgoCD автоматично синхронізує:**
+   ```bash
+   # Перевірити статус
+   kubectl get applications -n infra-tools
+   
+   # Перевірити поди
+   kubectl get pods -n application
+   ```
+
+### Перевірка GitOps
+
+```bash
+# Перевірити історію синхронізації
+argocd app history mlflow
+
+# Перевірити поточний стан
+argocd app get mlflow
+```
 
 ## Посилання на репозиторії
 
