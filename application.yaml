@@ -12,15 +12,15 @@ spec:
     chart: mlflow
     targetRevision: "0.1.0"
     helm:
-      values: |
-        # MLflow конфігурація
-        image:
-          repository: python
-          tag: "3.9-slim"
-        
-        # Додаткові команди для встановлення MLflow
-        command: ["/bin/sh"]
-        args: ["-c", "pip install mlflow && mlflow server --host=0.0.0.0 --port=5000 --backend-store-uri=sqlite:///mlflow.db --default-artifact-root=/mlflow/artifacts"]
+             values: |
+               # MLflow конфігурація
+               image:
+                 repository: python
+                 tag: "3.9-slim"
+                 
+               # Команда для встановлення MLflow та запуску сервера
+               command: ["/bin/sh"]
+               args: ["-c", "pip install mlflow && mlflow server --host=0.0.0.0 --port=5000 --backend-store-uri=sqlite:///mlflow.db --default-artifact-root=/mlflow/artifacts"]
         
         # MLflow server налаштування
         mlflow:
