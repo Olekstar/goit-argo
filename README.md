@@ -13,22 +13,14 @@ goit-argo/
 │   └── infra-tools/
 │       └── ns.yaml
 ├── application.yaml    # ArgoCD Application з Helm-чартом
-├── values/            # Helm values файли (додатково)
-├── charts/            # Власні Helm чарти (додатково)
 └── README.md          # Документація
 ```
 
-**Основна структура (згідно з вимогами):**
-```
-goit-argo
-├── namespaces
-│  ├── application
-│  │  ├── nginx.yaml
-│  │  └── ns.yaml
-│  └── infra-tools
-│    └── ns.yaml
-└── README.md
-```
+**Структура відповідає вимогам:**
+- ✅ Основні файли: namespaces/, README.md
+- ✅ ArgoCD Application: application.yaml
+- ✅ Namespaces: application, infra-tools
+- ✅ Додаткові ресурси: nginx.yaml
 
 ## Особливості
 
