@@ -18,14 +18,14 @@ spec:
           repository: burakince/mlflow
           tag: "3.4.0"
         
-        # Ресурси (оновлено v2.2)
+        # Ресурси (фінальна версія v2.4)
         resources:
           requests:
-            cpu: 500m
-            memory: 1.5Gi
+            cpu: 700m
+            memory: 2.5Gi
           limits:
-            cpu: 2000m
-            memory: 3Gi
+            cpu: 3000m
+            memory: 5Gi
         
         # Налаштування сервісу
         service:
