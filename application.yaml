@@ -15,8 +15,8 @@ spec:
       values: |
         # MLflow конфігурація
         image:
-          repository: mlflow/mlflow
-          tag: "2.8.1"
+          repository: python
+          tag: "3.9-slim"
         
         # Ресурси
         resources:
@@ -32,13 +32,26 @@ spec:
           backend-store-uri: "sqlite:///mlflow.db"
           default-artifact-root: "/mlflow/artifacts"
         
+        # Init container для встановлення MLflow
+        initContainers:
+          - name: install-mlflow
+            image: python:3.9-slim
+            command: ["pip", "install", "mlflow"]
+            volumeMounts:
+              - name: mlflow-bin
+                mountPath: /usr/local/bin
+        
         # Додаткові томи для збереження даних
         extraVolumes:
           - name: mlflow-data
             emptyDir: {}
+          - name: mlflow-bin
+            emptyDir: {}
         extraVolumeMounts:
           - name: mlflow-data
             mountPath: /mlflow
+          - name: mlflow-bin
+            mountPath: /usr/local/bin
   destination:
     server: https://kubernetes.default.svc
     namespace: application
