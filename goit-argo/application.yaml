@@ -7,13 +7,16 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    repoURL: https://github.com/Olekstar/goit-argo.git
-    path: charts/mlflow
-    targetRevision: HEAD
-    helm:
-      valueFiles:
-        - ../../values/mlflow-values.yaml
+  sources:
+    - repoURL: https://community-charts.github.io/helm-charts
+      chart: mlflow
+      targetRevision: "1.7.1"
+    - repoURL: https://github.com/Olekstar/goit-argo.git
+      targetRevision: HEAD
+      ref: values
+  helm:
+    valueFiles:
+      - values/mlflow-values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: application
