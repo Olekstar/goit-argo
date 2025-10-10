@@ -13,7 +13,21 @@ goit-argo/
 │   └── infra-tools/
 │       └── ns.yaml
 ├── application.yaml    # ArgoCD Application з Helm-чартом
+├── values/            # Helm values файли (додатково)
+├── charts/            # Власні Helm чарти (додатково)
 └── README.md          # Документація
+```
+
+**Основна структура (згідно з вимогами):**
+```
+goit-argo
+├── namespaces
+│  ├── application
+│  │  ├── nginx.yaml
+│  │  └── ns.yaml
+│  └── infra-tools
+│    └── ns.yaml
+└── README.md
 ```
 
 ## Особливості
@@ -188,6 +202,7 @@ argocd app get mlflow
 
 - **Infrastructure (Terraform)**: https://github.com/Olekstar/lesson-7.git
 - **GitOps (ArgoCD Applications)**: https://github.com/Olekstar/goit-argo.git
+- **ArgoCD Application**: https://github.com/Olekstar/goit-argo/blob/main/application.yaml
 
 ## Автоматичне розгортання
 
