@@ -131,3 +131,4 @@ kubectl patch application mlflow -n infra-tools --type merge -p '{"operation":{"
 - [ArgoCD Documentation](https://argo-cd.readthedocs.io/)
 - [MLflow Documentation](https://mlflow.org/docs/latest/index.html)
 - [Helm Charts](https://helm.sh/docs/)
+
