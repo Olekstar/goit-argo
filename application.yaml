@@ -15,8 +15,8 @@ spec:
       values: |
         # MLflow конфігурація
         image:
-          repository: burakince/mlflow
-          tag: "1.25.1"
+          repository: mlflow/mlflow
+          tag: "2.8.1"
         
         # Ресурси
         resources:
@@ -32,23 +32,11 @@ spec:
           backend-store-uri: "sqlite:///mlflow.db"
           default-artifact-root: "/mlflow/artifacts"
         
-        # Init container для встановлення MLflow в PATH
-        initContainers:
-          - name: setup-mlflow
-            image: burakince/mlflow:1.25.1
-            command: ["/bin/sh"]
-            args: ["-c", "cp /mlflow/.venv/bin/mlflow /usr/local/bin/mlflow"]
-            volumeMounts:
-              - name: mlflow-bin
-                mountPath: /usr/local/bin
+        # Додаткові томи для збереження даних
         extraVolumes:
-          - name: mlflow-bin
-            emptyDir: {}
           - name: mlflow-data
             emptyDir: {}
         extraVolumeMounts:
-          - name: mlflow-bin
-            mountPath: /usr/local/bin
           - name: mlflow-data
             mountPath: /mlflow
   destination:
