@@ -1,134 +1,151 @@
-# GoIT ArgoCD Applications
+# GoIT ArgoCD MLflow Deployment
 
-Цей репозиторій містить ArgoCD Applications та конфігурації для автоматичного розгортання застосунків у Kubernetes кластері.
+Цей репозиторій містить конфігурацію для автоматичного розгортання MLflow через ArgoCD з використанням Helm чарта.
 
-## Структура репозиторію
+## Структура проекту
 
 ```
 goit-argo/
 ├── namespaces/
 │   ├── application/
-│   │   └── ns.yaml          # Namespace для застосунків
+│   │   ├── nginx.yaml
+│   │   └── ns.yaml
 │   └── infra-tools/
-│       └── ns.yaml          # Namespace для інфраструктурних інструментів
-├── application.yaml         # ArgoCD Application для MLflow
-└── README.md               # Цей файл
+│     └── ns.yaml
+├── application.yaml
+└── README.md
 ```
 
-## ArgoCD Applications
+## Як запустити Terraform
 
-### MLflow
-
-**Application Name:** `mlflow`  
-**Namespace:** `application`  
-**Chart:** MLflow Helm Chart  
-**Repository:** https://community-charts.github.io/helm-charts
-
-#### Особливості конфігурації:
-
-- **Backend Store:** SQLite (для демонстрації)
-- **Artifact Root:** `/mlflow/artifacts`
-- **Service Type:** ClusterIP
-- **Persistence:** 10Gi з storage class `gp2`
-- **Resources:** 100m CPU, 256Mi Memory (requests)
-- **Auto-sync:** Увімкнено з prune та self-heal
-
-#### Доступ до MLflow:
-
-1. **Через port-forward:**
-   ```bash
-   kubectl port-forward svc/mlflow 5000:5000 -n application
-   ```
-   Після цього MLflow буде доступний за адресою: http://localhost:5000
-
-2. **Через LoadBalancer (якщо налаштовано):**
-   ```bash
-   kubectl get svc -n application
-   ```
-
-## Як використовувати
-
-### 1. Підключення репозиторію до ArgoCD
-
-1. Увійдіть в ArgoCD UI
-2. Перейдіть до Settings → Repositories
-3. Додайте новий репозиторій:
-   - **Type:** Git
-   - **Repository URL:** `https://github.com/Olekstar/goit-argo.git`
-   - **Branch:** `main`
-
-### 2. Створення Application
-
-ArgoCD автоматично підхопить `application.yaml` з цього репозиторію та створить Application для MLflow.
-
-### 3. Перевірка статусу
+### 1. Ініціалізація Terraform
 
 ```bash
-# Перевірити статус Application
+cd lesson-7/argocd
+terraform init
+```
+
+### 2. Застосування конфігурації
+
+```bash
+terraform apply
+```
+
+## Як перевірити, що ArgoCD працює
+
+### 1. Перевірка подів ArgoCD
+
+```bash
+kubectl get pods -n infra-tools
+```
+
+Має бути кілька подів з префіксом `argocd-`:
+- argocd-server
+- argocd-repo-server
+- argocd-dex-server
+- argocd-redis
+- argocd-application-controller
+
+### 2. Перевірка сервісів
+
+```bash
+kubectl get svc -n infra-tools
+```
+
+## Як відкрити UI ArgoCD
+
+### 1. Port-forward
+
+```bash
+kubectl port-forward svc/argocd-server -n infra-tools 8080:80
+```
+
+### 2. Доступ до веб-інтерфейсу
+
+Відкрийте браузер і перейдіть на: http://localhost:8080
+
+### 3. Логін
+
+- **Username**: admin
+- **Password**: отримати пароль командою:
+```bash
+kubectl -n infra-tools get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+```
+
+## Як перевірити, що деплой відбувся
+
+### 1. Перевірка ArgoCD Application
+
+```bash
 kubectl get applications -n infra-tools
+```
 
-# Перевірити поди MLflow
+### 2. Перевірка подів MLflow
+
+```bash
 kubectl get pods -n application
+```
 
-# Перевірити сервіси
+Має бути под `mlflow-*` у стані `Running`.
+
+### 3. Перевірка сервісів MLflow
+
+```bash
 kubectl get svc -n application
 ```
 
-### 4. Доступ до MLflow UI
+## Доступ до MLflow
+
+### 1. Port-forward MLflow
 
 ```bash
-# Port-forward для доступу до MLflow
-kubectl port-forward svc/mlflow 5000:5000 -n application
+kubectl port-forward svc/mlflow -n application 8081:80
 ```
 
-Після цього відкрийте браузер та перейдіть за адресою: http://localhost:5000
+### 2. Веб-інтерфейс MLflow
 
-## Налаштування
+Відкрийте браузер і перейдіть на: http://localhost:8081
 
-### Зміна конфігурації MLflow
+## Автоматичне розгортання
 
-Для зміни конфігурації MLflow відредагуйте файл `application.yaml` у секції `spec.source.helm.values` та закомітьте зміни:
+ArgoCD автоматично синхронізується з Git репозиторієм. При зміні файлу `application.yaml` та коміті змін:
 
-```bash
-git add application.yaml
-git commit -m "Update MLflow configuration"
-git push origin main
-```
-
-ArgoCD автоматично синхронізує зміни та оновить деплой.
-
-### Додавання нових Applications
-
-Для додавання нових застосунків:
-
-1. Створіть новий файл `application-<name>.yaml`
-2. Додайте відповідні namespaces у директорію `namespaces/`
-3. Закомітьте зміни
-
-## Troubleshooting
-
-### Перевірка логів ArgoCD
-
-```bash
-kubectl logs -n infra-tools deployment/argocd-application-controller
-kubectl logs -n infra-tools deployment/argocd-server
-```
-
-### Перевірка логів MLflow
-
-```bash
-kubectl logs -n application deployment/mlflow
-```
-
-### Синхронізація Application вручну
-
-```bash
-kubectl patch application mlflow -n infra-tools --type merge -p '{"operation":{"initiatedBy":{"username":"admin"},"sync":{"revision":"HEAD"}}}'
-```
+1. ArgoCD автоматично виявить зміни
+2. Синхронізує конфігурацію з кластером
+3. Оновить ресурси (Deployment, Service, Pod)
 
 ## Посилання
 
-- [ArgoCD Documentation](https://argo-cd.readthedocs.io/)
-- [MLflow Documentation](https://mlflow.org/docs/latest/index.html)
-- [Helm Charts](https://helm.sh/docs/)
+- **Git репозиторій**: https://github.com/Olekstar/goit-argo
+- **ArgoCD документація**: https://argo-cd.readthedocs.io/
+- **MLflow документація**: https://mlflow.org/docs/latest/index.html
+- **Helm чарт MLflow**: https://artifacthub.io/packages/helm/community-charts/mlflow
 
+## Troubleshooting
+
+### Проблема: Под не запускається
+
+```bash
+kubectl describe pod <pod-name> -n application
+kubectl logs <pod-name> -n application
+```
+
+### Проблема: ArgoCD не синхронізується
+
+```bash
+argocd app get mlflow
+argocd app sync mlflow
+```
+
+### Проблема: Недостатньо пам'яті
+
+Перевірте ресурси в `application.yaml`:
+```yaml
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+```
