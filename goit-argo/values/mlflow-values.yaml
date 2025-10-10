@@ -10,14 +10,14 @@ image:
   tag: "3.4.0"
   pullPolicy: IfNotPresent
 
-# Ресурси для MLflow
+# Ресурси для MLflow (оновлено v2.2)
 resources:
   requests:
-    cpu: 300m
-    memory: 1Gi
+    cpu: 500m
+    memory: 1.5Gi
   limits:
-    cpu: 1500m
-    memory: 2Gi
+    cpu: 2000m
+    memory: 3Gi
 
 # Налаштування сервісу
 service:
