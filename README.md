@@ -1,20 +1,21 @@
 # GoIT ArgoCD MLflow Deployment
 
-Цей репозиторій містить конфігурацію для автоматичного розгортання MLflow через ArgoCD з використанням Helm чарта.
+Цей репозиторій містить конфігурацію для автоматичного розгортання MLflow через ArgoCD з використанням готового Helm чарта з ArtifactHub.
 
 ## Структура проекту
 
 ```
 goit-argo/
-├── namespaces/
-│   ├── application/
-│   │   └── ns.yaml
-│   └── infra-tools/
-│       └── ns.yaml
-├── application.yaml
-├── Dockerfile
-└── README.md
+├── application.yaml    # ArgoCD Application з Helm-чартом
+└── README.md          # Документація
 ```
+
+## Особливості
+
+- ✅ Використовує готовий Helm-чарт `mlflow` з `community-charts`
+- ✅ Образ: `burakince/mlflow:3.4.0`
+- ✅ Ресурси: CPU 500m/2000m, Memory 1.5Gi/3Gi
+- ✅ Автоматична синхронізація через GitOps
 
 ## Передумови
 
