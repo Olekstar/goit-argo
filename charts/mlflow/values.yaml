@@ -10,14 +10,14 @@ image:
   tag: "3.4.0"
   pullPolicy: IfNotPresent
 
-# Ресурси для MLflow (v2.3)
+# Ресурси для MLflow (тест GitOps v2.4)
 resources:
   requests:
-    cpu: 600m
-    memory: 2Gi
+    cpu: 700m
+    memory: 2.5Gi
   limits:
-    cpu: 2500m
-    memory: 4Gi
+    cpu: 3000m
+    memory: 5Gi
 
 # Налаштування сервісу
 service:
