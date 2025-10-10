@@ -19,12 +19,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/mlflow/.venv/bin/mlflow"]
-          args:
-            - server
-            - --host=0.0.0.0
-            - --port=5000
-            - --backend-store-uri=sqlite:///:memory:
-            - --default-artifact-root=./mlruns
+          args: ["server", "--host=0.0.0.0", "--port=5000", "--backend-store-uri=sqlite:///:memory:", "--default-artifact-root=./mlruns"]
           ports:
             - name: http
               containerPort: 5000
