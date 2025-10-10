@@ -18,7 +18,7 @@ spec:
           repository: burakince/mlflow
           tag: "3.4.0"
         
-        # Ресурси (оновлено)
+        # Ресурси (оновлено v2.0)
         resources:
           requests:
             cpu: 300m
@@ -26,6 +26,31 @@ spec:
           limits:
             cpu: 1500m
             memory: 2Gi
+        
+        # Налаштування сервісу
+        service:
+          type: ClusterIP
+          port: 80
+          targetPort: 5000
+        
+        # Налаштування здоров'я
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
   destination:
     server: https://kubernetes.default.svc
     namespace: application

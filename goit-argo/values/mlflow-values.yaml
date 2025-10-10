@@ -1,0 +1,90 @@
+# MLflow Helm values
+# Використовуємо готовий чарт з community-charts
+
+# Кількість реплік
+replicaCount: 1
+
+# Образ контейнера
+image:
+  repository: burakince/mlflow
+  tag: "3.4.0"
+  pullPolicy: IfNotPresent
+
+# Ресурси для MLflow
+resources:
+  requests:
+    cpu: 300m
+    memory: 1Gi
+  limits:
+    cpu: 1500m
+    memory: 2Gi
+
+# Налаштування сервісу
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 5000
+
+# Налаштування здоров'я
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 5000
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 5000
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Налаштування безпеки
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+
+# Налаштування поду
+podSecurityContext:
+  fsGroup: 1001
+  fsGroupChangePolicy: "OnRootMismatch"
+
+# MLflow конфігурація
+mlflow:
+  # Backend store (використовуємо файлову систему)
+  backendStore: "file:///mlflow/artifacts"
+  
+  # Default artifact root
+  defaultArtifactRoot: "file:///mlflow/artifacts"
+  
+  # Налаштування сервера
+  server:
+    host: "0.0.0.0"
+    port: 5000
+    workers: 4
+    maxContentLength: "100mb"
+    staticPrefix: "/static"
+    gunicornOptions: "--timeout 60 --keep-alive 2 --preload"
+
+# Persistence для артефактів
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  annotations: {}
+
+# Ingress (вимкнений за замовчуванням)
+ingress:
+  enabled: false
