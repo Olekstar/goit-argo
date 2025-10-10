@@ -20,7 +20,7 @@ spec:
                  
                # Команда для встановлення MLflow та запуску сервера
                command: ["/bin/sh"]
-               args: ["-c", "pip install mlflow && mlflow server --host=0.0.0.0 --port=5000 --backend-store-uri=sqlite:///mlflow.db --default-artifact-root=/mlflow/artifacts"]
+               args: ["-c", "pip install mlflow && exec mlflow server --host=0.0.0.0 --port=5000 --backend-store-uri=sqlite:///mlflow.db --default-artifact-root=/mlflow/artifacts"]
         
         # MLflow server налаштування
         mlflow:
