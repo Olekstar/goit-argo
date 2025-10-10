@@ -18,6 +18,10 @@ spec:
           repository: python
           tag: "3.9-slim"
         
+        # Додаткові команди для встановлення MLflow
+        command: ["/bin/sh"]
+        args: ["-c", "pip install mlflow && mlflow server --host=0.0.0.0 --port=5000 --backend-store-uri=sqlite:///mlflow.db --default-artifact-root=/mlflow/artifacts"]
+        
         # MLflow server налаштування
         mlflow:
           backendStoreUri: "sqlite:///mlflow.db"
