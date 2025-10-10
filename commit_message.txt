@@ -1,0 +1,8 @@
+# Test automatic GitOps sync - MLflow v2.3
+
+- CPU requests: 500m → 600m
+- CPU limits: 2000m → 2500m  
+- Memory requests: 1.5Gi → 2Gi
+- Memory limits: 3Gi → 4Gi
+
+Testing if ArgoCD automatically picks up changes from Git repository.
