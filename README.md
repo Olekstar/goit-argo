@@ -2,6 +2,29 @@
 
 Цей репозиторій містить конфігурацію для автоматичного розгортання MLflow через ArgoCD з використанням готового Helm чарта з ArtifactHub.
 
+## Поточний стан ArgoCD ✅
+
+**ArgoCD успішно розгорнутий та працює:**
+- ✅ Application Controller - працює
+- ✅ ApplicationSet Controller - працює  
+- ✅ Redis - працює (проблему вирішено)
+- ✅ Repo Server - працює
+- ✅ Server - працює
+
+**Доступ до ArgoCD:**
+- URL: http://localhost:8080 (після port-forward)
+- Логін: `admin`
+- Пароль: `-2zH4k-oMnYZ8otF`
+
+**Швидкий старт:**
+```bash
+# Перевірити стан ArgoCD
+kubectl get pods -n infra-tools
+
+# Запустити port-forward
+kubectl port-forward svc/argocd-server -n infra-tools 8080:80
+```
+
 ## Структура проекту
 
 ```
@@ -302,6 +325,24 @@ git push origin main
 - **Helm чарт MLflow**: https://artifacthub.io/packages/helm/community-charts/mlflow
 
 ## Troubleshooting
+
+### Проблема з Redis ArgoCD (ВИРІШЕНО ✅)
+
+**Симптоми:**
+- Redis под має статус `CreateContainerConfigError`
+- Помилка: `secret "argocd-redis" not found`
+
+**Рішення:**
+```bash
+# Створити секрет для Redis
+kubectl create secret generic argocd-redis --from-literal=auth=redis-password -n infra-tools
+
+# Видалити проблемний Redis под для перезапуску
+kubectl delete pod <redis-pod-name> -n infra-tools
+
+# Перевірити, що новий под запустився
+kubectl get pods -n infra-tools
+```
 
 ### Проблема: Под не запускається
 
