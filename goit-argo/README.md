@@ -8,11 +8,11 @@
 goit-argo/
 ├── namespaces/
 │   ├── application/
+│   │   ├── nginx.yaml
 │   │   └── ns.yaml
 │   └── infra-tools/
 │       └── ns.yaml
 ├── application.yaml
-├── Dockerfile
 └── README.md
 ```
 
