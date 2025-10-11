@@ -8,9 +8,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://community-charts.github.io/helm-charts
-    chart: mlflow
-    targetRevision: "1.7.1"
+    repoURL: https://github.com/Olekstar/goit-argo.git
+    path: .
+    targetRevision: working-structure
     helm:
       values: |
         # MLflow конфігурація - GitOps демонстрація v7.0
