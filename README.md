@@ -2,19 +2,18 @@
 
 Цей репозиторій містить конфігурацію для автоматичного розгортання MLflow через ArgoCD з використанням готового Helm чарта з ArtifactHub.
 
-## Поточний стан ArgoCD ✅
+## Поточний стан ArgoCD
 
-**ArgoCD успішно розгорнутий та працює:**
-- ✅ Application Controller - працює
-- ✅ ApplicationSet Controller - працює  
-- ✅ Redis - працює (проблему з секретом вирішено)
-- ✅ Repo Server - працює
-- ✅ Server - працює
+ArgoCD успішно розгорнутий та працює. Всі компоненти функціонують коректно:
+- Application Controller - працює
+- ApplicationSet Controller - працює  
+- Redis - працює (проблему з секретом вирішено)
+- Repo Server - працює
+- Server - працює
 
-**Виправлення проблеми з Redis:**
-- Проблема: конфлікт конфігурації `authSecret.enabled: false` з чартом ArgoCD
-- Рішення: змінено на `authSecret.enabled: true` для сумісності
-- Результат: Helm-реліз тепер має статус `deployed` замість `failed`
+### Виправлення проблеми з Redis
+
+Під час розгортання виникла проблема з конфігурацією Redis. Чарт ArgoCD очікував секрет навіть при вимкненій аутентифікації. Вирішено шляхом зміни `authSecret.enabled: false` на `authSecret.enabled: true` для сумісності з чартом. Тепер Helm-реліз має статус `deployed` замість `failed`.
 
 **Доступ до ArgoCD:**
 - URL: http://localhost:8080 (після port-forward)
@@ -44,20 +43,20 @@ goit-argo/
 └── README.md          # Документація
 ```
 
-**Структура відповідає вимогам:**
-- ✅ Основні файли: namespaces/, README.md
-- ✅ ArgoCD Application: application.yaml
-- ✅ Namespaces: application, infra-tools
-- ✅ Додаткові ресурси: nginx.yaml
+Структура відповідає вимогам завдання:
+- Основні файли: namespaces/, README.md
+- ArgoCD Application: application.yaml
+- Namespaces: application, infra-tools
+- Додаткові ресурси: nginx.yaml
 
 ## Особливості
 
-- ✅ Використовує готовий Helm-чарт `mlflow` з `community-charts`
-- ✅ Образ: `burakince/mlflow:3.4.0`
-- ✅ Ресурси: CPU 400m/2000m, Memory 1Gi/2Gi (GitOps v5.0)
-- ✅ Автоматична синхронізація через GitOps
-- ✅ Inline values в ArgoCD Application (Варіант A)
-- ✅ Доступ через kubectl port-forward
+- Використовує готовий Helm-чарт `mlflow` з `community-charts`
+- Образ: `burakince/mlflow:3.4.0`
+- Ресурси: CPU 400m/2000m, Memory 1Gi/2Gi
+- Автоматична синхронізація через GitOps
+- Inline values в ArgoCD Application
+- Доступ через kubectl port-forward
 
 ## Передумови
 
@@ -322,14 +321,15 @@ git push origin main
 # Kubernetes автоматично оновить поди
 ```
 
-### Демонстрація GitOps ✅
-**Успішно протестовано оновлення ресурсів:**
+### Демонстрація GitOps
+
+Протестовано оновлення ресурсів через GitOps:
 - CPU requests: `400m` → `600m`
 - Memory requests: `1Gi` → `1.2Gi`  
 - CPU limits: `2000m` → `2500m`
 - Memory limits: `2Gi` → `2.5Gi`
 
-**Процес оновлення:**
+Процес оновлення відбувається автоматично:
 1. Зміни в `application.yaml`
 2. `kubectl apply` оновлює Application
 3. ArgoCD виявляє зміни (`OutOfSync`)
