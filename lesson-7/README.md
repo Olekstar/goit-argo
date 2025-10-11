@@ -43,7 +43,66 @@ lesson-7/
 3. **kubectl** встановлений
 4. **helm** встановлений
 
+## S3 Backend
+
+Вся інфраструктура використовує S3 backend для збереження стану Terraform:
+
+- **S3 Bucket:** `mlops-tfstate-goit-hw5-6`
+- **Регіон:** `us-east-1`
+- **AWS Profile:** `goit-terraform`
+
+### Структура стану в S3:
+- `vpc/terraform.tfstate` - стан VPC
+- `eks/terraform.tfstate` - стан EKS кластера
+- `argocd/terraform.tfstate` - стан ArgoCD
+
+## Швидкий старт 🚀
+
+Якщо інфраструктура вже розгорнута, ви можете одразу отримати доступ до ArgoCD:
+
+```bash
+# Перевірити стан ArgoCD
+kubectl get pods -n infra-tools
+
+# Отримати пароль адміністратора
+kubectl -n infra-tools get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
+
+# Запустити port-forward для доступу до UI
+kubectl port-forward svc/argocd-server -n infra-tools 8080:80
+```
+
+**Доступ до ArgoCD UI:**
+- URL: http://localhost:8080
+- Логін: `admin`
+- Пароль: `-2zH4k-oMnYZ8otF`
+
 ## Розгортання інфраструктури
+
+### Відновлення з S3 Backend
+
+Якщо інфраструктура була раніше розгорнута та стан збережено в S3:
+
+```bash
+# Відновлення VPC
+cd vpc
+terraform init
+terraform apply
+
+# Відновлення EKS
+cd ../eks
+terraform init
+terraform apply
+
+# Налаштування kubectl
+aws eks update-kubeconfig --region us-east-1 --name goit --profile goit-terraform
+
+# Відновлення ArgoCD
+cd ../argocd
+terraform init
+terraform apply
+```
+
+### Первинне розгортання
 
 ### Крок 1: Розгортання VPC
 
@@ -67,7 +126,7 @@ terraform apply
 
 ```bash
 # Отримати конфігурацію для kubectl
-aws eks update-kubeconfig --region us-east-1 --name goit-eks-cluster
+aws eks update-kubeconfig --region us-east-1 --name goit --profile goit-terraform
 
 # Перевірити підключення
 kubectl get nodes
@@ -82,7 +141,32 @@ terraform plan
 terraform apply
 ```
 
+**Особливості конфігурації ArgoCD:**
+- Версія ArgoCD: `v2.10.4`
+- Helm чарт: `argo-cd v7.4.0`
+- Namespace: `infra-tools`
+- Redis аутентифікація: вимкнена
+- Dex (аутентифікація): вимкнена
+- Notifications: вимкнені
+- Server працює в `--insecure` режимі
+
 ## Доступ до ArgoCD
+
+### Поточний стан ArgoCD ✅
+
+ArgoCD успішно розгорнутий та працює в namespace `infra-tools`:
+
+```bash
+# Перевірити статус всіх компонентів ArgoCD
+kubectl get all -n infra-tools
+```
+
+**Компоненти ArgoCD:**
+- ✅ Application Controller - працює
+- ✅ ApplicationSet Controller - працює  
+- ✅ Redis - працює
+- ✅ Repo Server - працює
+- ✅ Server - працює
 
 ### Отримання паролю адміністратора
 
@@ -90,6 +174,10 @@ terraform apply
 # Отримати пароль адміністратора
 kubectl -n infra-tools get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
 ```
+
+**Поточні дані для входу:**
+- **Логін:** `admin`
+- **Пароль:** `-2zH4k-oMnYZ8otF`
 
 ### Доступ через port-forward
 
@@ -184,6 +272,26 @@ kubectl logs -n infra-tools deployment/argocd-application-controller
 kubectl get pods -n infra-tools
 ```
 
+### Проблема з Redis (ВИРІШЕНО ✅)
+
+**Симптоми:**
+- Redis под має статус `CreateContainerConfigError`
+- Помилка: `secret "argocd-redis" not found`
+
+**Рішення:**
+```bash
+# Створити секрет для Redis
+kubectl create secret generic argocd-redis --from-literal=auth=redis-password -n infra-tools
+
+# Видалити проблемний Redis под для перезапуску
+kubectl delete pod <redis-pod-name> -n infra-tools
+
+# Перевірити, що новий под запустився
+kubectl get pods -n infra-tools
+```
+
+**Причина:** Helm чарт ArgoCD очікує секрет `argocd-redis` навіть при вимкненій аутентифікації Redis.
+
 ### Проблеми з MLflow
 
 ```bash
@@ -209,10 +317,13 @@ kubectl get networkpolicies -A
 ### ArgoCD CLI (опціонально)
 
 ```bash
-# Встановити ArgoCD CLI
-curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
-rm argocd-linux-amd64
+# Встановити ArgoCD CLI (macOS)
+brew install argocd
+
+# Або завантажити з GitHub
+curl -sSL -o argocd-darwin-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-darwin-amd64
+sudo install -m 555 argocd-darwin-amd64 /usr/local/bin/argocd
+rm argocd-darwin-amd64
 
 # Логін в ArgoCD через CLI
 argocd login localhost:8080 --insecure

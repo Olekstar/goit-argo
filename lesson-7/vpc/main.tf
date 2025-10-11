@@ -9,8 +9,7 @@ module "vpc" {
   public_subnets  = var.public_cidrs
   private_subnets = var.private_cidrs
 
-  public_subnet_map_public_ip_on_launch  = true
-  private_subnet_map_public_ip_on_launch = false
+  map_public_ip_on_launch = true
 
   enable_nat_gateway = true
   single_nat_gateway = true
