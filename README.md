@@ -7,14 +7,19 @@
 **ArgoCD успішно розгорнутий та працює:**
 - ✅ Application Controller - працює
 - ✅ ApplicationSet Controller - працює  
-- ✅ Redis - працює (проблему вирішено)
+- ✅ Redis - працює (проблему з секретом вирішено)
 - ✅ Repo Server - працює
 - ✅ Server - працює
+
+**Виправлення проблеми з Redis:**
+- Проблема: конфлікт конфігурації `authSecret.enabled: false` з чартом ArgoCD
+- Рішення: змінено на `authSecret.enabled: true` для сумісності
+- Результат: Helm-реліз тепер має статус `deployed` замість `failed`
 
 **Доступ до ArgoCD:**
 - URL: http://localhost:8080 (після port-forward)
 - Логін: `admin`
-- Пароль: `-2zH4k-oMnYZ8otF`
+- Пароль: `f4g4TayRIlsuxwIf`
 
 **Швидкий старт:**
 ```bash
@@ -316,6 +321,21 @@ git push origin main
 # ArgoCD автоматично синхронізує зміни
 # Kubernetes автоматично оновить поди
 ```
+
+### Демонстрація GitOps ✅
+**Успішно протестовано оновлення ресурсів:**
+- CPU requests: `400m` → `600m`
+- Memory requests: `1Gi` → `1.2Gi`  
+- CPU limits: `2000m` → `2500m`
+- Memory limits: `2Gi` → `2.5Gi`
+
+**Процес оновлення:**
+1. Зміни в `application.yaml`
+2. `kubectl apply` оновлює Application
+3. ArgoCD виявляє зміни (`OutOfSync`)
+4. Автоматична синхронізація
+5. Rolling update без простою
+6. Статус: `Synced` і `Healthy`
 
 ## Посилання
 
