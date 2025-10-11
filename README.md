@@ -35,17 +35,17 @@ kubectl port-forward svc/argocd-server -n infra-tools 8080:80
 goit-argo/
 ├── namespaces/
 │   ├── application/
+│   │   ├── application.yaml  # ArgoCD Application з Helm-чартом
 │   │   ├── nginx.yaml
 │   │   └── ns.yaml
 │   └── infra-tools/
 │       └── ns.yaml
-├── application.yaml    # ArgoCD Application з Helm-чартом
 └── README.md          # Документація
 ```
 
 Структура відповідає вимогам завдання:
 - Основні файли: namespaces/, README.md
-- ArgoCD Application: application.yaml
+- ArgoCD Application: namespaces/application/application.yaml
 - Namespaces: application, infra-tools
 - Додаткові ресурси: nginx.yaml
 
@@ -180,7 +180,7 @@ kubectl get svc mlflow -n application
 
 ### Як оновити MLflow через Git
 
-1. **Відредагуйте `application.yaml`:**
+1. **Відредагуйте `namespaces/application/application.yaml`:**
    ```yaml
    helm:
      values: |
@@ -193,7 +193,7 @@ kubectl get svc mlflow -n application
 
 2. **Закомітьте зміни:**
    ```bash
-   git add application.yaml
+   git add namespaces/application/application.yaml
    git commit -m "Update MLflow resources"
    git push origin main
    ```
@@ -221,7 +221,7 @@ argocd app get mlflow
 
 - **Infrastructure (Terraform)**: https://github.com/Olekstar/lesson-7.git
 - **GitOps (ArgoCD Applications)**: https://github.com/Olekstar/goit-argo.git
-- **ArgoCD Application**: https://github.com/Olekstar/goit-argo/blob/main/application.yaml
+- **ArgoCD Application**: https://github.com/Olekstar/goit-argo/blob/main/namespaces/application/application.yaml
 
 ## Автоматичне розгортання
 
@@ -300,7 +300,7 @@ kubectl port-forward svc/mlflow -n application 5000:80
 
 ## GitOps процес
 
-ArgoCD автоматично синхронізується з Git репозиторієм. При зміні файлу `application.yaml` та коміті змін:
+ArgoCD автоматично синхронізується з Git репозиторієм. При зміні файлу `namespaces/application/application.yaml` та коміті змін:
 
 1. ArgoCD автоматично виявить зміни
 2. Синхронізує конфігурацію з кластером
@@ -310,10 +310,10 @@ ArgoCD автоматично синхронізується з Git репози
 
 ```bash
 # Внести зміни в application.yaml
-vim application.yaml
+vim namespaces/application/application.yaml
 
 # Закомітити зміни
-git add application.yaml
+git add namespaces/application/application.yaml
 git commit -m "Update MLflow configuration"
 git push origin main
 
@@ -330,7 +330,7 @@ git push origin main
 - Memory limits: `2Gi` → `2.5Gi`
 
 Процес оновлення відбувається автоматично:
-1. Зміни в `application.yaml`
+1. Зміни в `namespaces/application/application.yaml`
 2. `kubectl apply` оновлює Application
 3. ArgoCD виявляє зміни (`OutOfSync`)
 4. Автоматична синхронізація
@@ -385,7 +385,7 @@ argocd app sync mlflow
 
 ### Проблема: Недостатньо пам'яті
 
-Перевірте ресурси в `application.yaml`:
+Перевірте ресурси в `namespaces/application/application.yaml`:
 ```yaml
 resources:
   requests:
