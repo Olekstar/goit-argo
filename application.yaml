@@ -20,14 +20,14 @@ spec:
           repository: burakince/mlflow
           tag: "latest"
         
-        # Ресурси (оновлено v8.0 - ще більші ресурси для тестування)
+        # Ресурси (оновлено v8.0 - зменшені для тестування масштабування)
         resources:
           requests:
-            cpu: 800m
-            memory: 1.5Gi
+            cpu: 300m
+            memory: 512Mi
           limits:
-            cpu: 1500m
-            memory: 3Gi
+            cpu: 500m
+            memory: 1Gi
         
         # Налаштування сервісу
         service:
