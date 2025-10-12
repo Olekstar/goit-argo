@@ -31,7 +31,6 @@ spec:
         service:
           type: ClusterIP
           port: 80
-          targetPort: 5000
         
         # Налаштування здоров'я
         livenessProbe:
