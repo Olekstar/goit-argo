@@ -10,10 +10,10 @@ spec:
   source:
     repoURL: https://community-charts.github.io/helm-charts
     chart: mlflow
-    targetRevision: "1.6.0"
+    targetRevision: "1.7.1"
     helm:
       values: |
-        # MLflow конфігурація - GitOps демонстрація v8.0 (ОНОВЛЕНО v2)
+        # MLflow конфігурація - GitOps демонстрація v8.0 (ОНОВЛЕНО v3 - версія 1.7.1)
         replicaCount: 2
         
         image:
